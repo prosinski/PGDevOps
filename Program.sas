@@ -53,3 +53,40 @@ data class_bd;
 	format Birthdate ddmmyyd10.;
 	where Birthdate >= "01sep2005"d;
 run;
+
+data cars_avg;
+format mpg_mean 5.2;
+	set sashelp.cars;
+	mpg_mean = mean(mpg_city, mpg_highway);
+run;
+
+data sotm_avg;
+	set pg1.storm_range;
+	windAvg = mean(of wind1-wind4);
+run;
+
+
+data sotm_avg;
+	set pg1.storm_range;
+	windAvg = mean(of wind:);
+/*	drop wind:;*/
+run;
+
+data eu_occ_total;
+	set pg1.eu_occ;
+/*	konwersja z tekstu na liczbe: funkcja input w odwrotna strone put*/
+/*	continue konwertuje i w jaki sposób, informat*/
+	Year= input(substr(YearMon,1,4), 4.);
+	Month=input(substr(YearMon,6,2), 2.);
+	ReportDate = MDY (Month,1,Year);
+	Total = sum(Hotel, ShortStay, Camp);
+	Format Hotel ShortStay Camp Total comma17.
+			ReportDate monyy7.;
+	Keep Country Hotel ShortStay Camp ReportFate Total;
+run;
+
+data np_summary2;
+	set pg1.np_summary;
+	ParkType = SCAN(ParkName,-1);
+	Keep Reg Type ParkName ParkType;
+run;
