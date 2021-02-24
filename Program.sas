@@ -90,3 +90,100 @@ data np_summary2;
 	ParkType = SCAN(ParkName,-1);
 	Keep Reg Type ParkName ParkType;
 run;
+
+/*Wyrazenia warunkowe*/
+data cars_categories;
+	set sashelp.cars;
+	Length car_category $12;
+	if MSRP <= 30000 then do;
+		num_category = 1;
+		car_category = "Basic" ;
+	end;
+	else if MSRP <= 60000 then do;
+		num_category = 2;
+		car_category = "Luxury";
+	end;
+	else do 
+		num_category = 3;
+		car_category = "Extra Luxury";	
+	end;
+run;
+
+
+
+
+
+data Basic Luxury Extra_Luxury;
+	set sashelp.cars;
+	Length car_category $12;
+	if MSRP <= 30000 then do;
+		num_category = 1;
+		car_category = "Basic";
+		output Basic;
+	end;
+	else if MSRP <= 60000 then do;
+		num_category = 2;
+		car_category = "Luxury";
+		output Luxury;
+	end;
+	else do 
+		num_category = 3;
+		car_category = "Extra Luxury";	
+		output Extra_Luxury;
+	end;
+run;
+
+data parks monuments;
+	set pg1.np_summary;
+	where type in ("NM", "NP");
+	Campers = sum(BackcountryCampers, OtherCamping, RVCampers, TentCampers);
+	format Campers comma15.;
+	length ParkType $ 8;
+	if type = "NP" then do;
+		ParkType = "Park";
+		output parks;
+	end;
+	else do;
+		ParkType = "Monument";
+		output monuments;
+	end;
+	Keep Reg ParkName DayVisits OtherLodging Campers ParkType;
+run;
+
+data parks monuments;
+	set pg1.np_summary;
+	where type in ("NM", "NP");
+	Campers = sum(BackcountryCampers, OtherCamping, RVCampers, TentCampers);
+	format Campers comma15.;
+	length ParkType $ 8;
+	select;
+		when (type = "NP") do;
+		ParkType = "Park";
+		output parks;
+	end;
+	otherwise do;
+		ParkType = "Monument";
+		output monuments;
+	end;
+	end;
+	Keep Reg ParkName DayVisits OtherLodging Campers ParkType;
+run;
+
+/*zlaczenie danych w sql*/
+proc sql;
+	create table class_grades as
+	select t.name, sex, age, teacher, grade
+		from pg1.class_teachers as t
+		inner join pg1.class_update as c
+		on t.name = c.name;
+
+quit;
+
+proc sql;
+/* coalesce jesli posiada pusty wierszto bierze z nastepnej kolumny*/
+	select coalesce(t.name, c.name)as name, sex, age, teacher, grade
+		from pg1.class_teachers as t
+		full join pg1.class_update as c
+		on t.name = c.name;
+
+quit;
