@@ -56,3 +56,29 @@ data quiz;
 run;
 
 
+/*Sprawdzenie dlugosci*/
+data test;
+	a="ala ";
+/*	rutyna missing*/
+	call missing(a);
+/*	zwracaja wartosci po usunieciu spacji z konca*/
+	l1=length(a);
+/*	zwraca dlugosc zmiennej*/
+	l2=lengthc(a);
+/*	zwracaja wartosci po usunieciu spacji z konca*/
+	l3=lengthn(a);
+
+run;
+
+/*	funkcja cat x skleja tekst*/
+data test;
+/*	ustawienie dlugosci*/
+	length imie imie2 nazwisko $20;
+	imie="Katarzyna";
+	imie2="Barbara";
+	nazwisko="Kowalska";
+	fullname= cat(imie, imie2, nazwisko);
+	fullname2= imie !! imie2 || nazwisko;
+/*	usuniecie spacji  z odzieleniem 1 spacji slow*/
+	fullname3= catx(" ", imie, imie2, nazwisko);
+run;
