@@ -82,3 +82,98 @@ data test;
 /*	usuniecie spacji  z odzieleniem 1 spacji slow*/
 	fullname3= catx(" ", imie, imie2, nazwisko);
 run;
+
+data stocks2;
+	set pg2.stocks2(rename= (date=date_old high=high_old volume=volume_old));
+	Date = input(date_old, date9.);
+	High = input(high_old, best.);
+	Volume = input(volume_old, comma12.);
+	format Date ddmmyy10. Volume nlnum12.;
+	drop date_old high_old volume_old;
+run;
+data stocks3;
+	set stocks2;
+	value_zl = put(Volume, nlmny15.2);	
+
+
+run;
+   
+/*mamy jedene zbior a potem dorzucamy mniejsze zbiory to uzywamy procedury app*/
+/*1.Skopiuje dane z sashelp.class do work.class*/
+/*2.Dolacze dane z pg2.clas_new do work.class*/
+
+proc copy in=sashelp out=work;
+	select class;
+/*	opcjonalnie zamiast select mozna uzyc exclude,*/
+/*czyli skopiuj wszystko poza wymienionymi*/
+run;
+
+data class;
+	length name $9;
+	set sashelp.class;
+run;
+
+proc append base=class data=pg2.class_new;
+
+run;
+
+
+proc append base=class data=pg2.class_new2(rename=(student=name));
+run;
+
+
+/*Przetwarzanie w petlach*/
+
+data petlaDo;
+	do i=1 to 10; /*by 2* - zwieksza o 2;*/
+		los = rand("integer",1,100);
+		output;
+	end;
+run;
+
+
+/*petla dowhile*/
+
+data doWhile;
+	i=1;
+	do while(i<=10);
+		los = rand("integer",1,100);
+		output;
+		i=i+1;
+	end;
+
+
+run;
+
+data doList;
+	do miesiac ="Styczen", "Luty", "Marzec";
+	lostcard = rand ("integer",1,100);
+	output;
+end; 
+run;
+
+data doList;
+set sashelp.class;
+	do miesiac ="Styczen", "Luty", "Marzec";
+	lostcard = rand ("integer",1,100);
+	output;
+end; 
+run;
+
+
+/*Transpozycja kolumn*/
+proc transpose data=sashelp.class out=classT;
+	id name;
+	var Height Weight sex;
+	by Sexl;
+run;
+
+proc sort data=sashelp.class out=classS;
+	by age;
+run;
+
+proc transpose data=classS out=classT;
+	id name;
+	var Height Weight ;
+	by age;
+run;
