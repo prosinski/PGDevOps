@@ -187,3 +187,26 @@ proc sql;
 		on t.name = c.name;
 
 quit;
+
+data script;
+	infile "/opt/sas/Workshop/scripts/lesson4_practice3.sh";
+	input @ '-' a :$100. ;
+run;
+
+data script;
+	infile "/opt/sas/Workshop/scripts/lesson4_practice3.sh";
+	input @"#";
+	x = _infile_;
+	backup = find(x,"back");
+run;
+
+/*/opt/sas/Workshop/danePGDevOps/PD3/SASApp_STPServer_2020-01-28_sasapp_18318.log*/
+
+data script;
+	infile "/opt/sas/Workshop/danePGDevOps/PD3/SASApp_STPServer_2020-01-28_sasapp_18318.log";
+	input @"WARN";
+	date_f =input(SCAN(_infile_,1, "T"),yymmdd10.);
+	time = input(substr(_infile_,12,8),time.);
+	text = strip(substr(_infile_,find(_infile_," - ")+3));
+	format date_f ddmmyy10. time time.;
+run;
